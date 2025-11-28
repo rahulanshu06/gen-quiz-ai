@@ -116,8 +116,8 @@ const QuizGenerator = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      <div className="bg-gradient-card backdrop-blur-sm rounded-3xl p-8 shadow-card border border-border/50">
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="bg-card rounded-3xl p-8 shadow-card border border-border">
         {/* Topic Input */}
         <div className="space-y-3 mb-6">
           <div className="flex items-center space-x-2">
@@ -131,7 +131,7 @@ const QuizGenerator = () => {
             placeholder="Write detailed topic here... Example: JavaScript basics - variables, loops, functions, etc."
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
-            className="min-h-[120px] resize-none rounded-2xl border-2 focus:border-primary transition-smooth"
+            className="min-h-[120px] resize-none rounded-2xl border-2 focus:border-primary transition-smooth bg-background"
             disabled={isGenerating}
           />
           <p className="text-sm text-muted-foreground">
@@ -157,7 +157,7 @@ const QuizGenerator = () => {
               max="50"
               value={numQuestions}
               onChange={(e) => setNumQuestions(parseInt(e.target.value) || 10)}
-              className="rounded-2xl border-2 h-12 text-center text-lg font-medium"
+              className="rounded-2xl border-2 h-12 text-center text-lg font-medium bg-background"
               disabled={isGenerating}
             />
           </div>
@@ -177,7 +177,7 @@ const QuizGenerator = () => {
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <div className="flex-1 bg-secondary rounded-2xl h-12 flex items-center justify-center">
+              <div className="flex-1 bg-muted rounded-2xl h-12 flex items-center justify-center">
                 <span className="text-lg font-semibold">{timer} min</span>
               </div>
               <Button
@@ -209,16 +209,16 @@ const QuizGenerator = () => {
                 variant={difficulty === level ? "default" : "outline"}
                 onClick={() => setDifficulty(level)}
                 disabled={isGenerating}
-                className={`rounded-2xl h-14 text-base font-medium transition-smooth ${
+                className={`rounded-full h-14 text-base font-semibold transition-smooth ${
                   difficulty === level
                     ? level === "easy"
-                      ? "bg-success hover:bg-success/90"
+                      ? "bg-success hover:bg-success/90 text-success-foreground"
                       : level === "medium"
-                      ? "bg-warning hover:bg-warning/90 text-warning-foreground"
+                      ? "bg-primary hover:bg-primary/90 text-primary-foreground"
                       : level === "hard"
-                      ? "bg-destructive hover:bg-destructive/90"
-                      : "bg-gradient-primary"
-                    : ""
+                      ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+                      : "bg-dark-card hover:bg-dark-card/90 text-dark-card-foreground"
+                    : "hover:bg-muted"
                 }`}
               >
                 <span className="mr-2">{difficultyConfig[level].icon}</span>
@@ -234,7 +234,7 @@ const QuizGenerator = () => {
             <AlertCircle className="w-5 h-5 text-primary" />
             <Label className="font-semibold">Negative Marking</Label>
           </div>
-          <div className="flex items-center space-x-3 p-4 bg-secondary/50 rounded-2xl">
+          <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-2xl">
             <Switch
               id="negative-marking"
               checked={negativeMarking}
@@ -258,8 +258,8 @@ const QuizGenerator = () => {
                     variant={penalty === p ? "default" : "outline"}
                     onClick={() => setPenalty(p)}
                     disabled={isGenerating}
-                    className={`rounded-xl h-12 font-medium transition-smooth ${
-                      penalty === p ? "bg-primary" : ""
+                    className={`rounded-full h-12 font-semibold transition-smooth ${
+                      penalty === p ? "bg-primary text-primary-foreground" : "hover:bg-muted"
                     }`}
                   >
                     {p}
@@ -274,7 +274,7 @@ const QuizGenerator = () => {
         <Button
           onClick={handleGenerate}
           disabled={isGenerating}
-          className="w-full h-14 rounded-2xl text-lg font-semibold bg-gradient-primary hover:opacity-90 transition-smooth shadow-elegant"
+          className="w-full h-14 rounded-full text-lg font-bold bg-primary hover:bg-primary/90 text-primary-foreground transition-smooth shadow-card"
         >
           {isGenerating ? (
             <>
