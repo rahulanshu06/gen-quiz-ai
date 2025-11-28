@@ -189,6 +189,24 @@ const Results = () => {
               </Card>
             </div>
 
+            {/* Quiz Settings Info */}
+            <div className="flex flex-wrap gap-3 justify-center mb-6">
+              <Badge variant="outline" className="rounded-full px-4 py-1">
+                <Trophy className="h-3 w-3 mr-1" />
+                {quizData.settings.difficulty}
+              </Badge>
+              <Badge variant="outline" className="rounded-full px-4 py-1">
+                <AlertCircle className="h-3 w-3 mr-1" />
+                {quizData.questions.length} Questions
+              </Badge>
+              {quizData.settings.negativeMarking && (
+                <Badge variant="destructive" className="rounded-full px-4 py-1">
+                  <XCircle className="h-3 w-3 mr-1" />
+                  Negative Marking: {quizData.settings.penalty}
+                </Badge>
+              )}
+            </div>
+
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 justify-center">
               {user && !quizSaved && (
