@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
+import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle, Loader2, ListOrdered, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
@@ -140,8 +140,8 @@ const QuizGenerator = () => {
         {/* Topic Input */}
         <div className="space-y-3 mb-6">
           <div className="flex items-center space-x-2">
-            <BookOpen className="w-5 h-5 text-primary" />
-            <Label htmlFor="topic" className="text-lg font-semibold">
+            <BookOpen className="w-4 h-4 text-primary" />
+            <Label htmlFor="topic" className="text-base font-semibold">
               Topic / Subject
             </Label>
           </div>
@@ -158,82 +158,71 @@ const QuizGenerator = () => {
           </p>
         </div>
 
-        {/* Number of Questions and Timer */}
-        <div className="grid md:grid-cols-2 gap-6 mb-6">
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <div className="w-5 h-5 flex items-center justify-center">
-                <span className="text-primary font-bold">#</span>
+        {/* Number of Questions and Timer - Side by Side */}
+        <div className="space-y-3 mb-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <ListOrdered className="w-4 h-4 text-primary" />
+                <Label htmlFor="numQuestions" className="text-base font-semibold">
+                  No. of Questions
+                </Label>
               </div>
-              <Label htmlFor="numQuestions" className="font-semibold">
-                No. of Questions
-              </Label>
-            </div>
-            <Input
-              id="numQuestions"
-              type="number"
-              min="1"
-              max="50"
-              value={numQuestions || ""}
-              onChange={(e) => handleNumQuestionsChange(parseInt(e.target.value) || 0)}
-              placeholder="Enter number"
-              className="rounded-2xl border-2 h-12 text-center text-lg font-medium bg-background"
-              disabled={isGenerating}
-            />
-            <p className="text-xs text-muted-foreground text-center">
-              Maximum 50 questions allowed
-            </p>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Timer className="w-5 h-5 text-primary" />
-              <Label className="font-semibold">Timer (Minutes)</Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => adjustTimer(-1)}
-                className="rounded-full h-12 w-12"
-                disabled={isGenerating}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
               <Input
+                id="numQuestions"
                 type="number"
                 min="1"
-                max="300"
-                value={timer || ""}
-                onChange={(e) => {
-                  const val = parseInt(e.target.value) || 0;
-                  setTimer(Math.min(Math.max(val, 0), 300));
-                }}
-                placeholder="0"
-                className="flex-1 rounded-2xl border-2 h-12 text-center text-lg font-semibold bg-background"
+                max="50"
+                value={numQuestions || ""}
+                onChange={(e) => handleNumQuestionsChange(parseInt(e.target.value) || 0)}
+                placeholder=""
+                className="rounded-2xl border-2 h-12 text-center text-lg font-medium bg-background"
                 disabled={isGenerating}
               />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => adjustTimer(1)}
-                className="rounded-full h-12 w-12"
-                disabled={isGenerating}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
             </div>
-            <p className="text-xs text-muted-foreground text-center">
-              Auto-calculates (1 min/question) - You can adjust manually
-            </p>
+
+            <div className="space-y-2">
+              <div className="flex items-center space-x-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <Label className="text-base font-semibold">Timer</Label>
+              </div>
+              <div className="flex items-center space-x-2 h-12">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => adjustTimer(-1)}
+                  className="rounded-full h-10 w-10 flex-shrink-0"
+                  disabled={isGenerating}
+                >
+                  <Minus className="h-4 w-4" />
+                </Button>
+                <div className="flex-1 flex items-center justify-center gap-1 text-lg font-semibold">
+                  <span>{timer || 0}</span>
+                  <span className="text-sm text-muted-foreground">min</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => adjustTimer(1)}
+                  className="rounded-full h-10 w-10 flex-shrink-0"
+                  disabled={isGenerating}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <AlertCircle className="w-3 h-3" />
+            <span>Timer auto-adjusts: 1 min per question</span>
           </div>
         </div>
 
         {/* Difficulty Level */}
         <div className="space-y-3 mb-6">
           <div className="flex items-center space-x-2">
-            <GraduationCap className="w-5 h-5 text-primary" />
-            <Label className="font-semibold">Difficulty Level</Label>
+            <GraduationCap className="w-4 h-4 text-primary" />
+            <Label className="text-base font-semibold">Difficulty Level</Label>
           </div>
           <div className="grid grid-cols-2 gap-3">
             {(["easy", "medium", "hard", "mix"] as Difficulty[]).map((level) => (
@@ -242,7 +231,7 @@ const QuizGenerator = () => {
                 variant={difficulty === level ? "default" : "outline"}
                 onClick={() => setDifficulty(level)}
                 disabled={isGenerating}
-                className={`rounded-full h-14 text-base font-semibold transition-smooth ${
+                className={`rounded-full h-12 text-base font-semibold transition-smooth ${
                   difficulty === level
                     ? level === "easy"
                       ? "bg-success hover:bg-success/90 text-success-foreground"
@@ -262,12 +251,12 @@ const QuizGenerator = () => {
         </div>
 
         {/* Negative Marking */}
-        <div className="space-y-4 mb-6">
+        <div className="space-y-3 mb-6">
           <div className="flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-primary" />
-            <Label className="font-semibold">Negative Marking</Label>
+            <AlertCircle className="w-4 h-4 text-primary" />
+            <Label className="text-base font-semibold">Negative Marking</Label>
           </div>
-          <div className="flex items-center space-x-3 p-4 bg-muted/30 rounded-2xl">
+          <div className="flex items-center space-x-3 p-3 bg-muted/30 rounded-2xl">
             <Switch
               id="negative-marking"
               checked={negativeMarking}
