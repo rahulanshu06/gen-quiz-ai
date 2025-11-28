@@ -10,81 +10,54 @@ const Index = () => {
       
       <Header />
       
-      <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="container mx-auto max-w-7xl">
-          {/* Hero Section - Two Column Layout */}
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-32">
-            {/* Left: Text Content (order-2 on mobile, order-1 on desktop) */}
-            <div className="space-y-8 animate-scale-in lg:sticky lg:top-32 order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
-                <span className="text-sm font-semibold text-foreground">Powered by Advanced AI</span>
-              </div>
-              
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
-                Master Any Subject<br />
-                <span className="bg-gradient-primary bg-clip-text text-transparent">
-                  With AI Quizzes
-                </span>
-              </h1>
-              
-              <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground font-medium leading-relaxed">
-                Generate personalized multiple-choice quizzes instantly.
-                Perfect for students, educators, and lifelong learners.
-              </p>
-
-              {/* How it Works - Compact Version */}
-              <div className="space-y-6 pt-8">
-                <h2 className="text-3xl font-bold text-foreground">Three Simple Steps</h2>
-                
-                <div className="space-y-4">
-                  {[
-                    {
-                      step: "1",
-                      title: "Describe Your Topic",
-                      description: "Enter what you want to learn or test",
-                      icon: "✍️",
-                    },
-                    {
-                      step: "2",
-                      title: "Customize Settings",
-                      description: "Fine-tune difficulty, questions, and timer",
-                      icon: "⚙️",
-                    },
-                    {
-                      step: "3",
-                      title: "Take Your Quiz",
-                      description: "Get instant results and detailed analysis",
-                      icon: "🎯",
-                    },
-                  ].map((item) => (
-                    <div key={item.step} className="flex gap-4 items-start group">
-                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-primary font-bold text-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-smooth">
-                        {item.step}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-1 text-foreground">
-                          {item.title}
-                        </h3>
-                        <p className="text-muted-foreground leading-relaxed">
-                          {item.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Quiz Generator Form (order-1 on mobile, order-2 on desktop) */}
-            <div className="lg:pt-0 order-1 lg:order-2">
-              <QuizGenerator />
-            </div>
+      <main className="pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="container mx-auto max-w-4xl">
+          {/* Centered Quiz Generator */}
+          <div className="mb-16">
+            <QuizGenerator />
           </div>
 
+          {/* How it Works - Below Form */}
+          <div className="space-y-6 max-w-2xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground text-center">How It Works</h2>
+            
+            <div className="space-y-4">
+              {[
+                {
+                  step: "1",
+                  title: "Describe Your Topic",
+                  description: "Enter what you want to learn or test",
+                  icon: "✍️",
+                },
+                {
+                  step: "2",
+                  title: "Customize Settings",
+                  description: "Fine-tune difficulty, questions, and timer",
+                  icon: "⚙️",
+                },
+                {
+                  step: "3",
+                  title: "Take Your Quiz",
+                  description: "Get instant results and detailed analysis",
+                  icon: "🎯",
+                },
+              ].map((item) => (
+                <div key={item.step} className="flex gap-4 items-start group">
+                  <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-primary font-bold text-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-smooth">
+                    {item.step}
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold mb-1 text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
 
