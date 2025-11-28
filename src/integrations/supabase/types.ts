@@ -46,9 +46,11 @@ export type Database = {
           answers_data: Json
           completed_at: string
           correct_answers: number
+          guest_name: string | null
           id: string
           quiz_id: string
           score: number
+          shared_quiz_token: string | null
           time_taken_seconds: number
           total_questions: number
           unanswered: number
@@ -59,9 +61,11 @@ export type Database = {
           answers_data: Json
           completed_at?: string
           correct_answers: number
+          guest_name?: string | null
           id?: string
           quiz_id: string
           score: number
+          shared_quiz_token?: string | null
           time_taken_seconds: number
           total_questions: number
           unanswered: number
@@ -72,9 +76,11 @@ export type Database = {
           answers_data?: Json
           completed_at?: string
           correct_answers?: number
+          guest_name?: string | null
           id?: string
           quiz_id?: string
           score?: number
+          shared_quiz_token?: string | null
           time_taken_seconds?: number
           total_questions?: number
           unanswered?: number
@@ -130,12 +136,50 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_quizzes: {
+        Row: {
+          attempt_count: number
+          created_at: string
+          expires_at: string | null
+          id: string
+          quiz_id: string
+          share_token: string
+          view_count: number
+        }
+        Insert: {
+          attempt_count?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          quiz_id: string
+          share_token: string
+          view_count?: number
+        }
+        Update: {
+          attempt_count?: number
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          quiz_id?: string
+          share_token?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_quizzes_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_share_token: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
