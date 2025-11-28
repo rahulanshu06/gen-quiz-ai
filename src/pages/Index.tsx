@@ -10,10 +10,10 @@ const Index = () => {
       
       <Header />
       
-      <main className="pt-24 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
+      <main className="pt-20 sm:pt-24 pb-16 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="container mx-auto max-w-4xl">
           {/* Centered Quiz Generator */}
-          <div className="mb-16">
+          <div>
             <QuizGenerator />
           </div>
 
