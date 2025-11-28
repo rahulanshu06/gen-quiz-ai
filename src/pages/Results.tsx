@@ -19,6 +19,9 @@ interface ResultsData {
   wrongAnswers: number;
   unanswered: number;
   timeTaken: number;
+  isShared?: boolean;
+  shareToken?: string;
+  guestName?: string;
 }
 
 const Results = () => {
@@ -30,6 +33,9 @@ const Results = () => {
   const [quizSaved, setQuizSaved] = useState(false);
 
   const resultsData = location.state as ResultsData | undefined;
+  const isShared = resultsData?.isShared;
+  const shareToken = resultsData?.shareToken;
+  const guestName = resultsData?.guestName;
 
   useEffect(() => {
     if (!resultsData) {
@@ -39,6 +45,12 @@ const Results = () => {
         variant: "destructive",
       });
       navigate("/");
+      return;
+    }
+
+    // Auto-save for shared quizzes
+    if (isShared && shareToken) {
+      handleSaveSharedAttempt();
     }
   }, [resultsData, navigate, toast]);
 
@@ -53,7 +65,69 @@ const Results = () => {
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
+  const handleSaveSharedAttempt = async () => {
+    if (!shareToken) return;
+
+    try {
+      // Get the quiz_id from shared_quizzes
+      const { data: sharedQuiz, error: sharedError } = await supabase
+        .from("shared_quizzes")
+        .select("quiz_id, id")
+        .eq("share_token", shareToken)
+        .single();
+
+      if (sharedError) throw sharedError;
+
+      // Save the attempt as guest
+      const { error: attemptError } = await supabase
+        .from("quiz_attempts")
+        .insert({
+          quiz_id: sharedQuiz.quiz_id,
+          user_id: null,
+          score,
+          total_questions: quizData.questions.length,
+          correct_answers: correctAnswers,
+          wrong_answers: wrongAnswers,
+          unanswered,
+          time_taken_seconds: timeTaken,
+          answers_data: answers as any,
+          shared_quiz_token: shareToken,
+          guest_name: guestName,
+        });
+
+      if (attemptError) throw attemptError;
+
+      // Increment attempt count
+      const { data: currentShared } = await supabase
+        .from("shared_quizzes")
+        .select("attempt_count")
+        .eq("id", sharedQuiz.id)
+        .single();
+
+      if (currentShared) {
+        await supabase
+          .from("shared_quizzes")
+          .update({ 
+            attempt_count: (currentShared.attempt_count || 0) + 1
+          })
+          .eq("id", sharedQuiz.id);
+      }
+
+    } catch (error: any) {
+      console.error("Error saving shared attempt:", error);
+    }
+  };
+
   const handleSaveQuiz = async () => {
+    // Don't allow save for shared quizzes - already auto-saved
+    if (isShared) {
+      toast({
+        title: "Already Saved",
+        description: "Your attempt has been saved automatically",
+      });
+      return;
+    }
+
     if (!user) {
       toast({
         title: "Login Required",
@@ -209,7 +283,7 @@ const Results = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 justify-center">
-              {user && !quizSaved && (
+              {!isShared && user && !quizSaved && (
                 <Button
                   onClick={handleSaveQuiz}
                   disabled={isSaving}
@@ -229,7 +303,14 @@ const Results = () => {
                 </Button>
               )}
               
-              {!user && (
+              {isShared && (
+                <div className="flex items-center gap-2 px-6 py-2 bg-success/10 text-success rounded-full border border-success/20">
+                  <CheckCircle2 className="h-4 w-4" />
+                  <span className="text-sm font-medium">Results saved as {guestName}</span>
+                </div>
+              )}
+              
+              {!user && !isShared && (
                 <Button
                   onClick={() => navigate("/auth")}
                   className="rounded-full bg-gradient-primary px-8"
