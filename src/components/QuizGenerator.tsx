@@ -10,6 +10,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
 import QuizLoadingScreen from "./QuizLoadingScreen";
+import { useAuth } from "@/contexts/AuthContext";
 
 type Difficulty = "easy" | "medium" | "hard" | "mix";
 type Penalty = -0.25 | -0.5 | -0.75 | -1.0;
@@ -26,6 +27,7 @@ const QuizGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const handleNumQuestionsChange = (value: number) => {
     if (isNaN(value) || value === 0) {
@@ -47,6 +49,17 @@ const QuizGenerator = () => {
   };
 
   const handleGenerate = async () => {
+    // Check if user is logged in
+    if (!user) {
+      toast({
+        title: "Login Required",
+        description: "Please sign in to generate quizzes",
+        variant: "destructive",
+      });
+      navigate("/auth");
+      return;
+    }
+
     if (!topic.trim()) {
       toast({
         title: "Topic Required",
