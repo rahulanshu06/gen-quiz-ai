@@ -1,8 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -36,6 +39,66 @@ serve(async (req) => {
   }
 
   try {
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    
+    // Get client IP address
+    const clientIP = req.headers.get('x-forwarded-for')?.split(',')[0] || 
+                     req.headers.get('x-real-ip') || 
+                     'unknown';
+
+    // Check authentication
+    const authHeader = req.headers.get('Authorization');
+    const token = authHeader?.replace('Bearer ', '');
+    let isAuthenticated = false;
+    
+    if (token) {
+      const { data: { user }, error } = await supabase.auth.getUser(token);
+      isAuthenticated = !error && !!user;
+    }
+
+    // If not authenticated, check IP rate limit
+    if (!isAuthenticated) {
+      const FREE_GENERATION_LIMIT = 5;
+      
+      // Check current count for this IP
+      const { data: rateLimit, error: rateLimitError } = await supabase
+        .from('ip_rate_limits')
+        .select('*')
+        .eq('ip_address', clientIP)
+        .single();
+
+      if (!rateLimitError && rateLimit) {
+        if (rateLimit.generation_count >= FREE_GENERATION_LIMIT) {
+          console.log('Rate limit exceeded for IP:', clientIP);
+          return new Response(JSON.stringify({ 
+            error: 'rate_limit_exceeded',
+            message: 'You have reached the free generation limit. Please sign up or login to continue.',
+            remainingGenerations: 0
+          }), {
+            status: 429,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
+
+        // Update count
+        await supabase
+          .from('ip_rate_limits')
+          .update({ 
+            generation_count: rateLimit.generation_count + 1,
+            last_generation_at: new Date().toISOString()
+          })
+          .eq('ip_address', clientIP);
+      } else {
+        // Create new rate limit entry
+        await supabase
+          .from('ip_rate_limits')
+          .insert({ 
+            ip_address: clientIP,
+            generation_count: 1
+          });
+      }
+    }
+
     const requestBody = await req.json();
     
     // Validate input
