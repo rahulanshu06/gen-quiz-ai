@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      ip_rate_limits: {
+        Row: {
+          created_at: string | null
+          first_generation_at: string | null
+          generation_count: number | null
+          id: string
+          ip_address: string
+          last_generation_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          first_generation_at?: string | null
+          generation_count?: number | null
+          id?: string
+          ip_address: string
+          last_generation_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          first_generation_at?: string | null
+          generation_count?: number | null
+          id?: string
+          ip_address?: string
+          last_generation_at?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

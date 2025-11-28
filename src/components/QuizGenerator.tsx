@@ -49,17 +49,6 @@ const QuizGenerator = () => {
   };
 
   const handleGenerate = async () => {
-    // Check if user is logged in
-    if (!user) {
-      toast({
-        title: "Login Required",
-        description: "Please sign in to generate quizzes",
-        variant: "destructive",
-      });
-      navigate("/auth");
-      return;
-    }
-
     if (!topic.trim()) {
       toast({
         title: "Topic Required",
@@ -95,6 +84,26 @@ const QuizGenerator = () => {
           penalty: negativeMarking ? penalty : 0,
         },
       });
+
+      // Check for rate limit error
+      if (data?.error === 'rate_limit_exceeded') {
+        toast({
+          title: "Free Limit Reached",
+          description: "You've used all 5 free quiz generations. Please sign up or login to continue.",
+          variant: "destructive",
+          action: (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => navigate("/auth")}
+            >
+              Sign Up / Login
+            </Button>
+          ),
+        });
+        setIsGenerating(false);
+        return;
+      }
 
       if (error) throw error;
 
