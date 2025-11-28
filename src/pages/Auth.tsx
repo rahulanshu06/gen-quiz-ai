@@ -11,7 +11,7 @@ import { z } from "zod";
 import { Loader2 } from "lucide-react";
 
 const emailSchema = z.string().email("Invalid email address");
-const passwordSchema = z.string().min(6, "Password must be at least 6 characters");
+const passwordSchema = z.string().min(8, "Password must be at least 8 characters");
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -248,7 +248,7 @@ const Auth = () => {
                     required
                   />
                   <p className="text-xs text-muted-foreground">
-                    Must be at least 6 characters
+                    Must be at least 8 characters
                   </p>
                 </div>
                 <Button

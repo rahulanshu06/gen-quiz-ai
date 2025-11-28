@@ -90,7 +90,6 @@ const Dashboard = () => {
       if (error) throw error;
       setAttempts(data || []);
     } catch (error: any) {
-      console.error("Error fetching attempts:", error);
       toast({
         title: "Error",
         description: "Failed to load quiz history",

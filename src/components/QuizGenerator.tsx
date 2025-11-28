@@ -113,7 +113,6 @@ const QuizGenerator = () => {
         });
       }, 500);
     } catch (error: any) {
-      console.error("Error generating quiz:", error);
       toast({
         title: "Generation Failed",
         description: error.message || "Failed to generate quiz. Please try again.",
