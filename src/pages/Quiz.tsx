@@ -12,6 +12,9 @@ const Quiz = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const quizData = location.state?.quizData as QuizData | undefined;
+  const isShared = location.state?.isShared as boolean | undefined;
+  const shareToken = location.state?.shareToken as string | undefined;
+  const guestName = location.state?.guestName as string | undefined;
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<UserAnswer[]>([]);
@@ -142,6 +145,9 @@ const Quiz = () => {
         wrongAnswers,
         unanswered,
         timeTaken,
+        isShared,
+        shareToken,
+        guestName,
       },
     });
   };
