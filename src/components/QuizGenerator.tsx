@@ -17,8 +17,8 @@ const questionSchema = z.number().min(1).max(50);
 
 const QuizGenerator = () => {
   const [topic, setTopic] = useState("");
-  const [numQuestions, setNumQuestions] = useState(10);
-  const [timer, setTimer] = useState(10);
+  const [numQuestions, setNumQuestions] = useState(0);
+  const [timer, setTimer] = useState(0);
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [negativeMarking, setNegativeMarking] = useState(false);
   const [penalty, setPenalty] = useState<Penalty>(-0.25);
@@ -27,6 +27,11 @@ const QuizGenerator = () => {
   const navigate = useNavigate();
 
   const handleNumQuestionsChange = (value: number) => {
+    if (isNaN(value) || value === 0) {
+      setNumQuestions(0);
+      setTimer(0);
+      return;
+    }
     const validatedValue = Math.min(Math.max(value, 1), 50);
     setNumQuestions(validatedValue);
     // Auto-calculate timer: 1 minute per question
@@ -165,8 +170,9 @@ const QuizGenerator = () => {
               type="number"
               min="1"
               max="50"
-              value={numQuestions}
-              onChange={(e) => handleNumQuestionsChange(parseInt(e.target.value) || 1)}
+              value={numQuestions || ""}
+              onChange={(e) => handleNumQuestionsChange(parseInt(e.target.value) || 0)}
+              placeholder="Enter number"
               className="rounded-2xl border-2 h-12 text-center text-lg font-medium bg-background"
               disabled={isGenerating}
             />
@@ -194,11 +200,12 @@ const QuizGenerator = () => {
                 type="number"
                 min="1"
                 max="300"
-                value={timer}
+                value={timer || ""}
                 onChange={(e) => {
-                  const val = parseInt(e.target.value) || 1;
-                  setTimer(Math.min(Math.max(val, 1), 300));
+                  const val = parseInt(e.target.value) || 0;
+                  setTimer(Math.min(Math.max(val, 0), 300));
                 }}
+                placeholder="0"
                 className="flex-1 rounded-2xl border-2 h-12 text-center text-lg font-semibold bg-background"
                 disabled={isGenerating}
               />
