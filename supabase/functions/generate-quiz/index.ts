@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
@@ -8,13 +9,26 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface QuizRequest {
-  topic: string;
-  numQuestions: number;
-  difficulty: string;
-  negativeMarking: boolean;
-  penalty: number;
-}
+// Input validation schema
+const QuizRequestSchema = z.object({
+  topic: z.string()
+    .trim()
+    .min(1, "Topic is required")
+    .max(500, "Topic must be less than 500 characters"),
+  numQuestions: z.number()
+    .int("Number of questions must be an integer")
+    .min(1, "Must have at least 1 question")
+    .max(50, "Cannot exceed 50 questions"),
+  difficulty: z.enum(["easy", "medium", "hard", "mix"], {
+    errorMap: () => ({ message: "Invalid difficulty level" })
+  }),
+  negativeMarking: z.boolean(),
+  penalty: z.number()
+    .min(-1.0, "Penalty cannot be less than -1.0")
+    .max(0, "Penalty must be negative or zero")
+});
+
+type QuizRequest = z.infer<typeof QuizRequestSchema>;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -22,9 +36,24 @@ serve(async (req) => {
   }
 
   try {
-    const { topic, numQuestions, difficulty, negativeMarking, penalty }: QuizRequest = await req.json();
+    const requestBody = await req.json();
+    
+    // Validate input
+    const validationResult = QuizRequestSchema.safeParse(requestBody);
+    if (!validationResult.success) {
+      console.error('Validation failed:', validationResult.error.errors);
+      return new Response(JSON.stringify({ 
+        error: 'Invalid input parameters',
+        details: validationResult.error.errors.map(e => e.message)
+      }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
 
-    console.log('Generating quiz:', { topic, numQuestions, difficulty });
+    const { topic, numQuestions, difficulty, negativeMarking, penalty } = validationResult.data;
+
+    console.log('Generating quiz:', { topic: topic.substring(0, 50), numQuestions, difficulty });
 
     const systemPrompt = `You are an expert quiz generator. Create high-quality multiple-choice questions with clear, unambiguous answers. Each question should have exactly 4 options labeled A, B, C, D, with only one correct answer. Provide detailed explanations for why the correct answer is right and why other options are wrong.`;
 
@@ -108,7 +137,7 @@ Return ONLY a valid JSON object in this exact format:
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
-    console.error('Error in generate-quiz function:', error);
+    console.error('Error in generate-quiz function:', error instanceof Error ? error.message : 'Unknown error');
     return new Response(JSON.stringify({ 
       error: error instanceof Error ? error.message : 'Failed to generate quiz'
     }), {
