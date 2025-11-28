@@ -36,6 +36,9 @@ interface QuizAttempt {
     topic: string;
     difficulty: string;
     questions_data: any;
+    negative_marking: boolean | null;
+    penalty: number | null;
+    timer_minutes: number;
   };
 }
 
@@ -75,7 +78,10 @@ const Dashboard = () => {
           quizzes (
             topic,
             difficulty,
-            questions_data
+            questions_data,
+            negative_marking,
+            penalty,
+            timer_minutes
           )
         `)
         .eq("user_id", user!.id)
@@ -127,9 +133,9 @@ const Dashboard = () => {
             topic: attempt.quizzes.topic,
             difficulty: attempt.quizzes.difficulty,
             totalQuestions: attempt.total_questions,
-            timerMinutes: Math.ceil(attempt.time_taken_seconds / 60),
-            negativeMarking: false,
-            penalty: 0,
+            timerMinutes: attempt.quizzes.timer_minutes || Math.ceil(attempt.time_taken_seconds / 60),
+            negativeMarking: attempt.quizzes.negative_marking || false,
+            penalty: attempt.quizzes.penalty || 0,
           },
         },
       },
@@ -316,6 +322,11 @@ const Dashboard = () => {
                             <Badge variant={isPassed ? "default" : "secondary"}>
                               {percentage}%
                             </Badge>
+                            {attempt.quizzes.negative_marking && (
+                              <Badge variant="destructive" className="text-xs">
+                                Penalty: {attempt.quizzes.penalty}
+                              </Badge>
+                            )}
                           </div>
                           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                             <span className="flex items-center">
