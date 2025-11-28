@@ -12,95 +12,79 @@ const Index = () => {
       
       <main className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="container mx-auto max-w-7xl">
-          {/* Hero Section */}
-          <div className="text-center mb-20 space-y-8 animate-scale-in">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-              </span>
-              <span className="text-sm font-semibold text-foreground">Powered by Advanced AI</span>
-            </div>
-            
-            <h1 className="text-6xl sm:text-7xl lg:text-8xl font-bold text-foreground leading-[1.1] tracking-tight">
-              Master Any Subject<br />
-              <span className="bg-gradient-primary bg-clip-text text-transparent">
-                With AI Quizzes
-              </span>
-            </h1>
-            
-            <p className="text-xl sm:text-2xl lg:text-3xl text-muted-foreground max-w-4xl mx-auto font-medium leading-relaxed">
-              Generate personalized multiple-choice quizzes instantly.
-              <br className="hidden lg:block" />
-              Perfect for students, educators, and lifelong learners.
-            </p>
-          </div>
-
-          {/* Quiz Generator Card */}
-          <div className="max-w-4xl mx-auto mb-32">
-            <QuizGenerator />
-          </div>
-
-          {/* How it Works Section */}
-          <div id="how-to-use" className="max-w-7xl mx-auto">
-            <div className="text-center mb-20 space-y-4">
-              <h2 className="text-5xl lg:text-6xl font-bold text-foreground tracking-tight">
-                Three Simple Steps
-              </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Create your perfect quiz in seconds
+          {/* Hero Section - Two Column Layout */}
+          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-32">
+            {/* Left: Text Content */}
+            <div className="space-y-8 animate-scale-in lg:sticky lg:top-32">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">Powered by Advanced AI</span>
+              </div>
+              
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-foreground leading-[1.1] tracking-tight">
+                Master Any Subject<br />
+                <span className="bg-gradient-primary bg-clip-text text-transparent">
+                  With AI Quizzes
+                </span>
+              </h1>
+              
+              <p className="text-lg sm:text-xl lg:text-2xl text-muted-foreground font-medium leading-relaxed">
+                Generate personalized multiple-choice quizzes instantly.
+                Perfect for students, educators, and lifelong learners.
               </p>
-            </div>
-            
-            <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
-              {[
-                {
-                  step: "1",
-                  title: "Describe Your Topic",
-                  description: "Enter detailed information about what you want to learn or test your knowledge on",
-                  icon: "✍️",
-                },
-                {
-                  step: "2",
-                  title: "Customize Settings",
-                  description: "Fine-tune difficulty level, question count, timer duration, and scoring rules",
-                  icon: "⚙️",
-                },
-                {
-                  step: "3",
-                  title: "Take Your Quiz",
-                  description: "AI generates questions instantly. Complete the quiz and receive detailed performance analysis",
-                  icon: "🎯",
-                },
-              ].map((item, index) => (
-                <div
-                  key={item.step}
-                  className="relative group"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  <div className="bg-gradient-card rounded-3xl p-10 shadow-card border border-border hover:shadow-elegant transition-smooth hover:scale-105 h-full">
-                    <div className="text-6xl mb-6 text-center group-hover:scale-110 transition-smooth">
-                      {item.icon}
+
+              {/* How it Works - Compact Version */}
+              <div className="space-y-6 pt-8">
+                <h2 className="text-3xl font-bold text-foreground">Three Simple Steps</h2>
+                
+                <div className="space-y-4">
+                  {[
+                    {
+                      step: "1",
+                      title: "Describe Your Topic",
+                      description: "Enter what you want to learn or test",
+                      icon: "✍️",
+                    },
+                    {
+                      step: "2",
+                      title: "Customize Settings",
+                      description: "Fine-tune difficulty, questions, and timer",
+                      icon: "⚙️",
+                    },
+                    {
+                      step: "3",
+                      title: "Take Your Quiz",
+                      description: "Get instant results and detailed analysis",
+                      icon: "🎯",
+                    },
+                  ].map((item) => (
+                    <div key={item.step} className="flex gap-4 items-start group">
+                      <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-gradient-primary font-bold text-lg flex items-center justify-center shadow-lg group-hover:scale-110 transition-smooth">
+                        {item.step}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold mb-1 text-foreground">
+                          {item.title}
+                        </h3>
+                        <p className="text-muted-foreground leading-relaxed">
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
-                    <div className="w-14 h-14 rounded-2xl bg-gradient-primary font-bold text-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                      {item.step}
-                    </div>
-                    <h3 className="text-2xl lg:text-3xl font-bold mb-4 text-center text-foreground">
-                      {item.title}
-                    </h3>
-                    <p className="text-muted-foreground text-center leading-relaxed text-lg">
-                      {item.description}
-                    </p>
-                  </div>
-                  
-                  {/* Connector line for desktop */}
-                  {index < 2 && (
-                    <div className="hidden md:block absolute top-1/2 -right-6 lg:-right-12 w-12 lg:w-24 h-0.5 bg-gradient-to-r from-primary/50 to-transparent" />
-                  )}
+                  ))}
                 </div>
-              ))}
+              </div>
+            </div>
+
+            {/* Right: Quiz Generator Form */}
+            <div className="lg:pt-0">
+              <QuizGenerator />
             </div>
           </div>
+
         </div>
       </main>
 
