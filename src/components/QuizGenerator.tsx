@@ -1,11 +1,13 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle } from "lucide-react";
+import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 type Difficulty = "easy" | "medium" | "hard" | "mix";
 type Penalty = -0.25 | -0.5 | -0.75 | -1.0;
@@ -17,7 +19,9 @@ const QuizGenerator = () => {
   const [difficulty, setDifficulty] = useState<Difficulty>("medium");
   const [negativeMarking, setNegativeMarking] = useState(false);
   const [penalty, setPenalty] = useState<Penalty>(-0.25);
+  const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const adjustTimer = (delta: number) => {
     const newValue = timer + delta;
@@ -26,7 +30,7 @@ const QuizGenerator = () => {
     }
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!topic.trim()) {
       toast({
         title: "Topic Required",
@@ -36,10 +40,72 @@ const QuizGenerator = () => {
       return;
     }
 
-    toast({
-      title: "Generating Quiz...",
-      description: "AI is creating your personalized quiz",
-    });
+    if (numQuestions < 1 || numQuestions > 50) {
+      toast({
+        title: "Invalid Number",
+        description: "Number of questions must be between 1 and 50",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsGenerating(true);
+
+    try {
+      toast({
+        title: "Generating Quiz...",
+        description: "AI is creating your personalized quiz",
+      });
+
+      const { data, error } = await supabase.functions.invoke("generate-quiz", {
+        body: {
+          topic: topic.trim(),
+          numQuestions,
+          difficulty,
+          negativeMarking,
+          penalty: negativeMarking ? penalty : 0,
+        },
+      });
+
+      if (error) throw error;
+
+      if (!data || !data.questions) {
+        throw new Error("Invalid response from server");
+      }
+
+      toast({
+        title: "Quiz Generated!",
+        description: `Created ${data.questions.length} questions. Starting quiz...`,
+      });
+
+      // Navigate to quiz page with data
+      setTimeout(() => {
+        navigate("/quiz", {
+          state: {
+            quizData: {
+              questions: data.questions,
+              settings: {
+                topic: topic.trim(),
+                difficulty,
+                negativeMarking,
+                penalty: negativeMarking ? penalty : 0,
+                totalQuestions: numQuestions,
+                timerMinutes: timer,
+              },
+            },
+          },
+        });
+      }, 500);
+    } catch (error: any) {
+      console.error("Error generating quiz:", error);
+      toast({
+        title: "Generation Failed",
+        description: error.message || "Failed to generate quiz. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const difficultyConfig = {
@@ -66,6 +132,7 @@ const QuizGenerator = () => {
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             className="min-h-[120px] resize-none rounded-2xl border-2 focus:border-primary transition-smooth"
+            disabled={isGenerating}
           />
           <p className="text-sm text-muted-foreground">
             Provide detailed topic description for better questions
@@ -91,6 +158,7 @@ const QuizGenerator = () => {
               value={numQuestions}
               onChange={(e) => setNumQuestions(parseInt(e.target.value) || 10)}
               className="rounded-2xl border-2 h-12 text-center text-lg font-medium"
+              disabled={isGenerating}
             />
           </div>
 
@@ -105,6 +173,7 @@ const QuizGenerator = () => {
                 size="icon"
                 onClick={() => adjustTimer(-1)}
                 className="rounded-full h-12 w-12"
+                disabled={isGenerating}
               >
                 <Minus className="h-4 w-4" />
               </Button>
@@ -116,6 +185,7 @@ const QuizGenerator = () => {
                 size="icon"
                 onClick={() => adjustTimer(1)}
                 className="rounded-full h-12 w-12"
+                disabled={isGenerating}
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -138,6 +208,7 @@ const QuizGenerator = () => {
                 key={level}
                 variant={difficulty === level ? "default" : "outline"}
                 onClick={() => setDifficulty(level)}
+                disabled={isGenerating}
                 className={`rounded-2xl h-14 text-base font-medium transition-smooth ${
                   difficulty === level
                     ? level === "easy"
@@ -168,6 +239,7 @@ const QuizGenerator = () => {
               id="negative-marking"
               checked={negativeMarking}
               onCheckedChange={setNegativeMarking}
+              disabled={isGenerating}
             />
             <Label htmlFor="negative-marking" className="text-base cursor-pointer">
               Enable Negative Marking
@@ -185,6 +257,7 @@ const QuizGenerator = () => {
                     key={p}
                     variant={penalty === p ? "default" : "outline"}
                     onClick={() => setPenalty(p)}
+                    disabled={isGenerating}
                     className={`rounded-xl h-12 font-medium transition-smooth ${
                       penalty === p ? "bg-primary" : ""
                     }`}
@@ -200,10 +273,20 @@ const QuizGenerator = () => {
         {/* Generate Button */}
         <Button
           onClick={handleGenerate}
+          disabled={isGenerating}
           className="w-full h-14 rounded-2xl text-lg font-semibold bg-gradient-primary hover:opacity-90 transition-smooth shadow-elegant"
         >
-          <Play className="mr-2 h-5 w-5" />
-          Generate Quiz
+          {isGenerating ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Generating Quiz...
+            </>
+          ) : (
+            <>
+              <Play className="mr-2 h-5 w-5" />
+              Generate Quiz
+            </>
+          )}
         </Button>
       </div>
     </div>
@@ -211,3 +294,4 @@ const QuizGenerator = () => {
 };
 
 export default QuizGenerator;
+
