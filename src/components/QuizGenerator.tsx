@@ -9,6 +9,7 @@ import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle, Loader2
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { z } from "zod";
+import QuizLoadingScreen from "./QuizLoadingScreen";
 
 type Difficulty = "easy" | "medium" | "hard" | "mix";
 type Penalty = -0.25 | -0.5 | -0.75 | -1.0;
@@ -131,7 +132,11 @@ const QuizGenerator = () => {
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
+    <>
+      {isGenerating && (
+        <QuizLoadingScreen totalQuestions={numQuestions} topic={topic.trim()} />
+      )}
+      <div className="w-full max-w-3xl mx-auto">
       <div className="bg-card rounded-3xl p-8 shadow-card border border-border">
         {/* Topic Input */}
         <div className="space-y-3 mb-6">
@@ -319,6 +324,7 @@ const QuizGenerator = () => {
         </Button>
       </div>
     </div>
+    </>
   );
 };
 
