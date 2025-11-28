@@ -14,8 +14,8 @@ const Index = () => {
         <div className="container mx-auto max-w-7xl">
           {/* Hero Section - Two Column Layout */}
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start mb-32">
-            {/* Left: Text Content */}
-            <div className="space-y-8 animate-scale-in lg:sticky lg:top-32">
+            {/* Left: Text Content (order-2 on mobile, order-1 on desktop) */}
+            <div className="space-y-8 animate-scale-in lg:sticky lg:top-32 order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
@@ -79,8 +79,8 @@ const Index = () => {
               </div>
             </div>
 
-            {/* Right: Quiz Generator Form */}
-            <div className="lg:pt-0">
+            {/* Right: Quiz Generator Form (order-1 on mobile, order-2 on desktop) */}
+            <div className="lg:pt-0 order-1 lg:order-2">
               <QuizGenerator />
             </div>
           </div>
