@@ -131,12 +131,12 @@ const QuizGenerator = () => {
     mix: { color: "primary", icon: "🎨" },
   };
 
+  if (isGenerating) {
+    return <QuizLoadingScreen totalQuestions={numQuestions} topic={topic.trim()} />;
+  }
+
   return (
-    <>
-      {isGenerating && (
-        <QuizLoadingScreen totalQuestions={numQuestions} topic={topic.trim()} />
-      )}
-      <div className="w-full max-w-3xl mx-auto">
+    <div className="w-full max-w-3xl mx-auto">
       <div className="bg-card rounded-3xl p-8 shadow-card border border-border">
         {/* Topic Input */}
         <div className="space-y-3 mb-6">
@@ -324,7 +324,6 @@ const QuizGenerator = () => {
         </Button>
       </div>
     </div>
-    </>
   );
 };
 

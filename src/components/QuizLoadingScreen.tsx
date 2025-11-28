@@ -42,8 +42,8 @@ const QuizLoadingScreen = ({ totalQuestions, topic }: QuizLoadingScreenProps) =>
   const CurrentIcon = steps[currentStep]?.icon || Brain;
 
   return (
-    <div className="fixed inset-0 bg-background/95 backdrop-blur-sm z-50 flex items-center justify-center">
-      <div className="w-full max-w-md px-6">
+    <div className="w-full max-w-3xl mx-auto">
+      <div className="w-full px-6">
         {/* Main loading card */}
         <div className="bg-card rounded-3xl p-8 shadow-card border border-border animate-scale-in">
           {/* Animated icon */}
@@ -132,22 +132,6 @@ const QuizLoadingScreen = ({ totalQuestions, topic }: QuizLoadingScreenProps) =>
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Floating particles animation */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute w-2 h-2 bg-primary/30 rounded-full animate-float"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${i * 0.5}s`,
-                animationDuration: `${3 + i}s`,
-              }}
-            />
-          ))}
         </div>
       </div>
     </div>
