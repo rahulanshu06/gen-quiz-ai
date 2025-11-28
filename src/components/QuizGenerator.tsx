@@ -8,9 +8,12 @@ import { Label } from "@/components/ui/label";
 import { Plus, Minus, Play, BookOpen, Timer, GraduationCap, AlertCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
 
 type Difficulty = "easy" | "medium" | "hard" | "mix";
 type Penalty = -0.25 | -0.5 | -0.75 | -1.0;
+
+const questionSchema = z.number().min(1).max(50);
 
 const QuizGenerator = () => {
   const [topic, setTopic] = useState("");
@@ -22,6 +25,13 @@ const QuizGenerator = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  const handleNumQuestionsChange = (value: number) => {
+    const validatedValue = Math.min(Math.max(value, 1), 50);
+    setNumQuestions(validatedValue);
+    // Auto-calculate timer: 1 minute per question
+    setTimer(validatedValue);
+  };
 
   const adjustTimer = (delta: number) => {
     const newValue = timer + delta;
@@ -156,16 +166,19 @@ const QuizGenerator = () => {
               min="1"
               max="50"
               value={numQuestions}
-              onChange={(e) => setNumQuestions(parseInt(e.target.value) || 10)}
+              onChange={(e) => handleNumQuestionsChange(parseInt(e.target.value) || 1)}
               className="rounded-2xl border-2 h-12 text-center text-lg font-medium bg-background"
               disabled={isGenerating}
             />
+            <p className="text-xs text-muted-foreground text-center">
+              Maximum 50 questions allowed
+            </p>
           </div>
 
           <div className="space-y-3">
             <div className="flex items-center space-x-2">
               <Timer className="w-5 h-5 text-primary" />
-              <Label className="font-semibold">Timer</Label>
+              <Label className="font-semibold">Timer (Minutes)</Label>
             </div>
             <div className="flex items-center space-x-2">
               <Button
@@ -177,9 +190,18 @@ const QuizGenerator = () => {
               >
                 <Minus className="h-4 w-4" />
               </Button>
-              <div className="flex-1 bg-muted rounded-2xl h-12 flex items-center justify-center">
-                <span className="text-lg font-semibold">{timer} min</span>
-              </div>
+              <Input
+                type="number"
+                min="1"
+                max="300"
+                value={timer}
+                onChange={(e) => {
+                  const val = parseInt(e.target.value) || 1;
+                  setTimer(Math.min(Math.max(val, 1), 300));
+                }}
+                className="flex-1 rounded-2xl border-2 h-12 text-center text-lg font-semibold bg-background"
+                disabled={isGenerating}
+              />
               <Button
                 variant="outline"
                 size="icon"
@@ -191,7 +213,7 @@ const QuizGenerator = () => {
               </Button>
             </div>
             <p className="text-xs text-muted-foreground text-center">
-              Timer auto-adjusts: 1 min per question
+              Auto-calculates (1 min/question) - You can adjust manually
             </p>
           </div>
         </div>
